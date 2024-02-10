@@ -109,4 +109,81 @@
 
   return new_time
 ```
+# BudgetApp
+```py
+  class Category:
+  
+  def __init__(self,name):
+    self.name = name
+    self.ledger =[]
+    self.balance = 0.0
+    self.spent = 0.0
+  def deposit(self,amount,description=''):
+    self.ledger.append({"amount":amount,"description":description})
+    self.balance += amount
+  def withdraw(self,amount,description=''):
+    if self.check_funds(amount):
+      self.ledger.append({"amount":-amount,"description":description})
+      self.balance -= amount
+      self.spent += amount
+      return True
+    else:
+      return False
+  def transfer(self,amount,rec):
+    if self.check_funds(amount):
+      self.withdraw(amount,"Transfer to "+rec.name)
+      rec.deposit(amount,"Transfer from "+self.name)
+      return True
+    else:
+      return False
+  def get_balance(self):
+    return self.balance
+    
+  def check_funds(self,amount):
+    return self.balance >= amount
+  def __str__(self):
+    s = self.name.center(30,"*")+"\n"
+    for i in self.ledger:
+      s+=i["description"][:23].ljust(23)+str("{:.2f}".format(i["amount"])).rjust(7)+"\n"
+    s+="Total: "+str(self.balance)
+    return s
 
+
+def create_spend_chart(categories):
+  total = 0
+  #return str(len(categories))
+  spent = []
+  for category in categories:
+    total += category.spent
+  for category in categories:
+    val = (category.spent*100)//total 
+   
+    spent.append(val)
+    
+  chart = "Percentage spent by category\n"
+  for i in range(100,-1,-10):
+    chart += str(i).rjust(3) + '| '
+    for percent in spent:
+      if percent >= i:
+        chart += 'o  '
+      else:
+        chart += '   '
+    chart += '\n'
+  chart += '    ' + '-' * (len(categories) * 3 + 1) + '\n'
+  max_len = 0
+  #-----------------------------------------------------
+  for category in categories:
+    if len(category.name) > max_len:
+      max_len = len(category.name)
+  for i in range(max_len):
+    chart += '     '
+    for category in categories:
+      if len(category.name) > i:
+        chart += category.name[i] + '  '
+      else:
+        chart += '   '
+    if i < max_len - 1:
+      chart += '\n'
+  return chart
+
+```
